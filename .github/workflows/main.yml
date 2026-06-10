@@ -27,7 +27,8 @@ jobs:
           channel-priority: strict
 
       - name: Build and install (inc. pytest)
-        run: pip install -e . pytest
+        run: |
+          python setup.py install
 
       - name: Verify tool dependencies
         run: |
@@ -35,4 +36,6 @@ jobs:
           bedtools --version
 
       - name: Run tests
-        run: pytest clipper/test -v
+        run: |
+          conda install -y pytest
+          pytest clipper/test -v
