@@ -29,8 +29,9 @@ jobs:
 
       - name: Build and install (inc. pytest)
         run: |
-          # if system gcc installed, we want to ensure we use the $CC exported
-          # by the conda env
+          # ensure conda compilers are used for linking even if a system one is available
+          echo "CC=$CC CXX=$CXX"
+          export CXX="${CXX:-${CC%-cc}-c++}"
           export LDSHARED="$CC -shared"
           python setup.py install
 
@@ -42,4 +43,7 @@ jobs:
       - name: Run tests
         run: |
           conda install -y pytest
-          pytest clipper/test -v
+          # Run against the INSTALLED package (not the uncompiled repo source).
+          # The test data ships via package_data, so --pyargs finds it.
+          cd "$RUNNER_TEMP"
+          pytest --pyargs clipper.test -v
