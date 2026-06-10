@@ -24,7 +24,7 @@ class Test(unittest.TestCase):
 
         # Test if file is not bam, but exists expected
         # result is to throw improper file error
-        handle = clipper.test_file("test_peakfinder.py")
+        handle = clipper.test_file("test.gtf")
         self.assertRaises(NameError, check_for_index, handle)
 
         # Test if file is bam and indexed expected
