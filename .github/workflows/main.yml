@@ -15,15 +15,16 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up conda env
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           environment-file: environment3.yml
           activate-environment: clipper3
-          auto-activate-base: false
+          auto-activate: false
           channels: conda-forge,bioconda
+          conda-remove-defaults: true
           channel-priority: strict
 
       - name: Build and install (inc. pytest)
