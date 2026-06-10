@@ -28,6 +28,9 @@ jobs:
 
       - name: Build and install (inc. pytest)
         run: |
+          # if system gcc installed, we want to ensure we use the $CC exported
+          # by the conda env
+          export LDSHARED="$CC -shared"
           python setup.py install
 
       - name: Verify tool dependencies
