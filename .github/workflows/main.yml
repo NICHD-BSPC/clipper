@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        # Ensure conda env is activated in each step
+        shell: bash -el {0}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v5
+
+      - name: Set up conda env
+        uses: conda-incubator/setup-miniconda@v4
+        with:
+          environment-file: environment3.yml
+          activate-environment: clipper3
+          auto-activate: false
+          channels: conda-forge,bioconda
+          conda-remove-defaults: true
+          channel-priority: strict
+
+      - name: Build and install (inc. pytest)
+        run: |
+          # ensure conda compilers are used for linking even if a system one is available
+          echo "CC=$CC CXX=$CXX"
+          export CXX="${CXX:-${CC%-cc}-c++}"
+          export LDSHARED="$CC -shared"
+          python setup.py install
+
+      - name: Verify tool dependencies
+        run: |
+          samtools --version | head -1
+          bedtools --version
+
+      - name: Run tests
+        run: |
+          conda install -y pytest
+          # Run against the INSTALLED package (not the uncompiled repo source).
+          # The test data ships via package_data, so --pyargs finds it.
+          cd "$RUNNER_TEMP"
+          pytest --pyargs clipper.test -v
